@@ -29,7 +29,8 @@ if len(message['content']) <= 2000:
     for h in hooks:
         r = requests.post(h, json=message)
         #print(h)
-        #print(content)    
+        #print(content)
+        #print(r.status_code)
 else:
     raise Exception("Content is too long! Must be less than 2000 characters")
-#print(r.status_code)
+
