@@ -2,35 +2,41 @@
 
 import requests
 import json
+from datetime import datetime
 
-# Hooks. Enter hook urls here
+# Hooks
 hooks = []
 
+# Number of spams
+n = 100
 
-# Bitcoin price index via Coindesk
+def generate_timestamp_message():
+    '''
+    Returns a json message with a timestamp.
+    For testing purposes.
+    '''
+    time = datetime.now()
+    content = """
+    generated on roadsauce at {}
+    """.format(time)
 
-bpi = requests.get("https://api.coindesk.com/v1/bpi/currentprice.json").json()
-date = bpi['time']['updated']
-disclaimer = bpi['disclaimer']
-price = bpi['bpi']['USD']['rate']
-
-content = """
-As of {}, the USD market value of Bitcoin was ${}.\n
-Disclaimer:
-{}
-""".format(date, price, disclaimer)
-
-# Build message
-message = {
+    # Build message
+    message = {
         'content': content,
-        }
-# Check to make sure the content will fit
-if len(message['content']) <= 2000:
-    for h in hooks:
-        r = requests.post(h, json=message)
-        #print(h)
-        #print(content)
-        #print(r.status_code)
-else:
-    raise Exception("Content is too long! Must be less than 2000 characters")
+    }
+    return message
 
+# Check to make sure the content will fit
+for h in hooks:
+    for x in range(n):
+        message = generate_timestamp_message()
+        if len(message['content']) <= 2000:
+            r = requests.post(h, json=message)
+            #print(h)
+            #print(content)    
+            print("response code: {} - response time (seconds): {}".format(
+                r.status_code,
+                r.elapsed.total_seconds()
+            ))
+        else:
+            raise Exception("Content is too long! Must be less than 2000 characters")
